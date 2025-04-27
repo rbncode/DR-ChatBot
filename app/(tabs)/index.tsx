@@ -10,11 +10,15 @@ import {
   Platform,
   Keyboard,
   SafeAreaView,
+  Dimensions,
 } from "react-native";
 import i18n from "../../i18n";
 import Markdown from "react-native-markdown-display";
 
 export default function ChatScreen() {
+  const screenWidth = Dimensions.get("window").width;
+  const isLargeSreen = screenWidth >= 600;
+
   const [messages, setMessages] = useState([
     { id: "1", sender: "assistant", text: i18n.t("assistantGreeting") },
   ]);
@@ -124,8 +128,8 @@ const styles = StyleSheet.create({
   messagesContainer: {
     padding: 10,
     paddingBottom: 80,
-    maxWidth: 700,
-    width: "80%",
+    maxWidth: 800,
+    width: "95%",
     alignSelf: "center",
   },
   message: {
@@ -149,7 +153,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 15,
-    maxWidth: 600,
+    maxWidth: 850,
     width: "90%",
     backgroundColor: "transparent",
     alignSelf: "center",
