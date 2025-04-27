@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import i18n from "../../i18n";
+import Markdown from "react-native-markdown-display";
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState([
@@ -67,9 +68,17 @@ export default function ChatScreen() {
         item.sender === "user" ? styles.user : styles.assistant,
       ]}
     >
-      <Text style={styles.messageText}>{item.text}</Text>
+      <Markdown
+        style={{
+          body: { fontSize: 14.5 },
+        }}
+      >
+        {item.text}
+      </Markdown>
     </View>
   );
+
+  const flatListRef = useRef<FlatList>(null);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#424242" }}>
@@ -80,10 +89,14 @@ export default function ChatScreen() {
       >
         <View style={styles.chatContainer}>
           <FlatList
+            ref={flatListRef}
             data={messages}
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
             contentContainerStyle={styles.messagesContainer}
+            onContentSizeChange={() =>
+              flatListRef.current?.scrollToEnd({ animated: true })
+            }
           />
         </View>
         <View style={styles.inputContainer}>
@@ -119,7 +132,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
     borderRadius: 10,
-    maxWidth: "75%",
   },
   user: {
     backgroundColor: "#DCF8C6",
