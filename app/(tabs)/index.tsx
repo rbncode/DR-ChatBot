@@ -18,7 +18,7 @@ export default function ChatScreen() {
   ]);
   const [input, setInput] = useState("");
 
-  const sendMessage = () => {
+  const sendMessage = async() => {
     if (!input.trim()) return;
 
     const userMessage = {
@@ -26,15 +26,43 @@ export default function ChatScreen() {
       sender: "user",
       text: input,
     };
-    const botResponse = {
-      id: (Date.now() + 1).toString(),
-      sender: "assistant",
-      text: `Dijiste: "${input}"`,
-    };
 
-    setMessages((prev) => [...prev, userMessage, botResponse]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
     Keyboard.dismiss();
+
+    try{
+      const response = await fetch("http://192.168.1.12:8000/chatbot/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({pregunta: input}),
+      })
+
+      const data = await response.json()
+
+      const botMessage = {
+        id: (Date.now() + 1).toString(),
+        sender: "assistant",
+        text: data.respuesta || "lo siento, no entendí eso.",
+      }
+
+      setMessages((prev) => [...prev, botMessage]);
+
+      //const botResponse = {
+      //  id: (Date.now() + 1).toString(),
+      //  sender: "assistant",
+      //  text: `Dijiste: "${input}"`,
+      //};
+    } catch(error) {
+      const errorMessage = {
+        id: (Date.now() + 2).toString(),
+        sender: "assistant",
+        text: "Hubo un error al contactar al servidor.",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    }
   };
 
   const renderItem = ({ item }: any) => (
