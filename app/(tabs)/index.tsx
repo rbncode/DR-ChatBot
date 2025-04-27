@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  SafeAreaView,
 } from "react-native";
 import i18n from "../../i18n";
 
@@ -18,7 +19,7 @@ export default function ChatScreen() {
   ]);
   const [input, setInput] = useState("");
 
-  const sendMessage = async() => {
+  const sendMessage = async () => {
     if (!input.trim()) return;
 
     const userMessage = {
@@ -31,31 +32,25 @@ export default function ChatScreen() {
     setInput("");
     Keyboard.dismiss();
 
-    try{
+    try {
       const response = await fetch("http://192.168.1.12:8000/chatbot/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({pregunta: input}),
-      })
+        body: JSON.stringify({ pregunta: input }),
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       const botMessage = {
         id: (Date.now() + 1).toString(),
         sender: "assistant",
         text: data.respuesta || "lo siento, no entendí eso.",
-      }
+      };
 
       setMessages((prev) => [...prev, botMessage]);
-
-      //const botResponse = {
-      //  id: (Date.now() + 1).toString(),
-      //  sender: "assistant",
-      //  text: `Dijiste: "${input}"`,
-      //};
-    } catch(error) {
+    } catch (error) {
       const errorMessage = {
         id: (Date.now() + 2).toString(),
         sender: "assistant",
@@ -77,35 +72,49 @@ export default function ChatScreen() {
   );
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <FlatList
-        data={messages}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.messagesContainer}
-      />
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder={i18n.t("placeholder")}
-          value={input}
-          onChangeText={setInput}
-          onSubmitEditing={sendMessage}
-        />
-        <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
-          <Text style={styles.sendText}>{i18n.t("send")}</Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#424242" }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={80}
+      >
+        <View style={styles.chatContainer}>
+          <FlatList
+            data={messages}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={styles.messagesContainer}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder={i18n.t("placeholder")}
+            value={input}
+            onChangeText={setInput}
+            onSubmitEditing={sendMessage}
+            placeholderTextColor="#999"
+          />
+          <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+            <Text style={styles.sendText}>{i18n.t("send")}</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#424242" },
-  messagesContainer: { padding: 10, paddingBottom: 80 }, // Ensure there is space for the input bar
+  chatContainer: {
+    flex: 1,
+  },
+  messagesContainer: {
+    padding: 10,
+    paddingBottom: 80,
+    maxWidth: 700,
+    width: "80%",
+    alignSelf: "center",
+  },
   message: {
     padding: 10,
     marginVertical: 5,
@@ -120,27 +129,33 @@ const styles = StyleSheet.create({
     backgroundColor: "#EAEAEA",
     alignSelf: "flex-start",
   },
-  messageText: { fontSize: 16 },
+  messageText: {
+    fontSize: 16,
+  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderTopWidth: 1,
-    borderColor: "#ccc",
-    backgroundColor: "#f1f1f1",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
+    paddingVertical: 15,
+    maxWidth: 600,
+    width: "90%",
+    backgroundColor: "transparent",
+    alignSelf: "center",
   },
   input: {
     flex: 1,
     fontSize: 16,
-    padding: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     backgroundColor: "#fff",
     borderRadius: 20,
   },
-  sendButton: { justifyContent: "center", paddingHorizontal: 15 },
-  sendText: { color: "#007AFF", fontWeight: "bold" },
+  sendButton: {
+    justifyContent: "center",
+    paddingHorizontal: 15,
+  },
+  sendText: {
+    color: "#007AFF",
+    fontWeight: "bold",
+  },
 });
