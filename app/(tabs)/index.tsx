@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,20 +12,29 @@ import {
   SafeAreaView,
   Dimensions,
 } from "react-native";
-import i18n from "../../i18n";
 import Markdown from "react-native-markdown-display";
 
 export default function ChatScreen() {
   const screenWidth = Dimensions.get("window").width;
-  const isLargeSreen = screenWidth >= 600;
-
-  const [messages, setMessages] = useState([
-    { id: "1", sender: "assistant", text: i18n.t("assistantGreeting") },
-  ]);
+  const [showHelp, setShowHelp] = useState(true);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const flatListRef = useRef<FlatList>(null);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
+
+    if (showHelp) {
+      setShowHelp(false);
+    }
 
     const userMessage = {
       id: Date.now().toString(),
@@ -38,7 +47,7 @@ export default function ChatScreen() {
     Keyboard.dismiss();
 
     try {
-      const response = await fetch("http://192.168.1.12:8000/chatbot/", {
+      const response = await fetch("http://192.168.6.152:8000/chatbot/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +60,7 @@ export default function ChatScreen() {
       const botMessage = {
         id: (Date.now() + 1).toString(),
         sender: "assistant",
-        text: data.respuesta || "lo siento, no entendí eso.",
+        text: data.respuesta || "Lo siento, no entendí eso.",
       };
 
       setMessages((prev) => [...prev, botMessage]);
@@ -74,15 +83,13 @@ export default function ChatScreen() {
     >
       <Markdown
         style={{
-          body: { fontSize: 14.5 },
+          text: { color: item.sender === "user" ? "#000" : "#fff" },
         }}
       >
         {item.text}
       </Markdown>
     </View>
   );
-
-  const flatListRef = useRef<FlatList>(null);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#424242" }}>
@@ -91,30 +98,51 @@ export default function ChatScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={80}
       >
+        {showHelp && (
+          <View style={styles.helpPopup}>
+            <Text style={styles.helpText}>
+              ¿Necesitas saber noticias, clima, valor del dólar o UF?
+              ¡Pregúntame para resolver tu duda! Puedes especificar el area del
+              clima o noticias que necesites :)
+            </Text>
+          </View>
+        )}
+
         <View style={styles.chatContainer}>
           <FlatList
             ref={flatListRef}
             data={messages}
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
-            contentContainerStyle={styles.messagesContainer}
-            onContentSizeChange={() =>
-              flatListRef.current?.scrollToEnd({ animated: true })
-            }
+            contentContainerStyle={[
+              styles.messagesContainer,
+              {
+                flexGrow: 1,
+                justifyContent: "flex-end",
+              },
+            ]}
+            onContentSizeChange={() => {
+              flatListRef.current?.scrollToEnd({ animated: false });
+            }}
+            onLayout={() => {
+              flatListRef.current?.scrollToEnd({ animated: false });
+            }}
           />
         </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder={i18n.t("placeholder")}
-            value={input}
-            onChangeText={setInput}
-            onSubmitEditing={sendMessage}
-            placeholderTextColor="#999"
-          />
-          <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
-            <Text style={styles.sendText}>{i18n.t("send")}</Text>
-          </TouchableOpacity>
+        <View style={styles.inputWrapper}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder={"¡Pregúnta algo!"}
+              value={input}
+              onChangeText={setInput}
+              onSubmitEditing={sendMessage}
+              placeholderTextColor="#999"
+            />
+            <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+              <Text style={styles.sendIcon}>➤</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -127,36 +155,53 @@ const styles = StyleSheet.create({
   },
   messagesContainer: {
     padding: 10,
-    paddingBottom: 80,
+    paddingBottom: 15,
     maxWidth: 800,
     width: "95%",
     alignSelf: "center",
   },
   message: {
     padding: 10,
-    marginVertical: 5,
-    borderRadius: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    marginVertical: 10,
+    borderRadius: 20,
+    maxWidth: "75%",
   },
   user: {
-    backgroundColor: "#DCF8C6",
+    backgroundColor: "#d9d9d9",
     alignSelf: "flex-end",
   },
+  userText: {
+    color: "#fffff",
+  },
   assistant: {
-    backgroundColor: "#EAEAEA",
+    backgroundColor: "#252525",
     alignSelf: "flex-start",
   },
+  assistantText: {
+    color: "#000",
+  },
+
   messageText: {
     fontSize: 16,
+  },
+  inputWrapper: {
+    backgroundColor: "transparent",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 10,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
-    paddingVertical: 15,
+    paddingVertical: 1,
     maxWidth: 850,
     width: "90%",
-    backgroundColor: "transparent",
+    backgroundColor: "#fff",
     alignSelf: "center",
+    borderRadius: 50,
   },
   input: {
     flex: 1,
@@ -168,10 +213,31 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     justifyContent: "center",
-    paddingHorizontal: 15,
+    paddingHorizontal: 5,
   },
-  sendText: {
-    color: "#007AFF",
-    fontWeight: "bold",
+  sendIcon: {
+    fontSize: 50,
+    color: "#525252",
+  },
+  helpPopup: {
+    position: "absolute",
+    alignContent: "flex-end",
+    top: 80,
+    alignSelf: "center",
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+    maxWidth: "80%",
+    zIndex: 10,
+  },
+  helpText: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#333",
   },
 });
