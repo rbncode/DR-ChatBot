@@ -12,7 +12,6 @@ import {
   SafeAreaView,
   Dimensions,
 } from "react-native";
-import i18n from "../../i18n";
 import Markdown from "react-native-markdown-display";
 
 export default function ChatScreen() {
