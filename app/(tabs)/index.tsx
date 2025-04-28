@@ -18,14 +18,17 @@ import Markdown from "react-native-markdown-display";
 export default function ChatScreen() {
   const screenWidth = Dimensions.get("window").width;
   const isLargeSreen = screenWidth >= 600;
+  const [showHelp, setShowHelp] = useState(true);
 
-  const [messages, setMessages] = useState([
-    { id: "1", sender: "assistant", text: i18n.t("assistantGreeting") },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 
   const sendMessage = async () => {
     if (!input.trim()) return;
+
+    if (showHelp) {
+      setShowHelp(false);
+    }
 
     const userMessage = {
       id: Date.now().toString(),
@@ -38,7 +41,7 @@ export default function ChatScreen() {
     Keyboard.dismiss();
 
     try {
-      const response = await fetch("http://192.168.1.12:8000/chatbot/", {
+      const response = await fetch("http://192.168.6.152:8000/chatbot/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +54,7 @@ export default function ChatScreen() {
       const botMessage = {
         id: (Date.now() + 1).toString(),
         sender: "assistant",
-        text: data.respuesta || "lo siento, no entendí eso.",
+        text: data.respuesta || "Lo siento, no entendí eso.",
       };
 
       setMessages((prev) => [...prev, botMessage]);
@@ -74,7 +77,7 @@ export default function ChatScreen() {
     >
       <Markdown
         style={{
-          body: { fontSize: 14.5 },
+          body: { fontSize: 16 },
         }}
       >
         {item.text}
@@ -91,6 +94,16 @@ export default function ChatScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={80}
       >
+        {showHelp && (
+          <View style={styles.helpPopup}>
+            <Text style={styles.helpText}>
+              ¿Necesitas saber noticias, clima, valor del dólar o UF?
+              ¡Pregúntame para resolver tu duda! Puedes especificar el area del
+              clima o noticias que necesites :)
+            </Text>
+          </View>
+        )}
+
         <View style={styles.chatContainer}>
           <FlatList
             ref={flatListRef}
@@ -134,8 +147,10 @@ const styles = StyleSheet.create({
   },
   message: {
     padding: 10,
-    marginVertical: 5,
-    borderRadius: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    marginVertical: 2,
+    borderRadius: 20,
   },
   user: {
     backgroundColor: "#DCF8C6",
@@ -173,5 +188,25 @@ const styles = StyleSheet.create({
   sendText: {
     color: "#007AFF",
     fontWeight: "bold",
+  },
+  helpPopup: {
+    position: "absolute",
+    top: 80,
+    alignSelf: "center",
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+    maxWidth: "80%",
+    zIndex: 10,
+  },
+  helpText: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#333",
   },
 });
