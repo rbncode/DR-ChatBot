@@ -1,50 +1,69 @@
-# Welcome to your Expo app 👋
+# Aplicación ChatBot
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Asistente virtual de ChatBot que se encarga de entregar respuestas del usuario respecto a UF, dólar, clima y noticias.
 
-## Get started
+### Integrantes del Proyecto
+- Francisca Neira
+- Benjamín Urrea
+- Robin Vásquez
+- Sebastián Yáñez
+- Sebastián Vidal
 
-1. Install dependencies
+## Requisitos de execución
+
+1. Instalación de dependencias Front-End
 
    ```bash
-   npm install
+   npm install expo
+   npm install react-native-markdown-display
    ```
 
-2. Start the app
+> [!IMPORTANT]
+> Además de estas dependencias, en caso de realizar pruebas desde el celular, se requiere de la aplicación Expo Go. Si se realizan desde un computador, ingresar desde el puerto en localhost asignado una vez iniciado.
+
+2. Instalación de dependencias del Back-End
 
    ```bash
-    npx expo start
+    pip install -r requirements.txt
+    pip install fastapi
+    pip install google-search-results
+    pip install google-generativeai python-dotenv
+    pip install transformers torch sentencepiece --user
+    pip install requests
    ```
 
-In the output, you'll find options to open the app in a
+3. Para realizar pruebas
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   ```bash
+    pip install pytest
+    cd backend
+    python -m pytest test_chatbot.py
+   ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Ejecución del proyecto
 
-## Get a fresh project
+Para ejecutar el proyecto se puede realizar por dos métodos distintos:
 
-When you're ready, run:
+1. Único terminal
 
-```bash
-npm run reset-project
-```
+   ```bash
+   npm run start
+   ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+> [!NOTE]
+> Esto ejecutará tanto el front-end como back-end para el projecto. Asegurarse que el IP de conexión de de REST esté acordé a la conexión Wi-Fi utilizada.
+   
+3. Ejecución por separado
 
-## Learn more
+- Para ejecutar Front-End:
+   ```bash
+   npx expo start
+   ```
 
-To learn more about developing your project with Expo, look at the following resources:
+- Para ejecutar Back-End:
+   ```bash
+   npm run start-back
+   ```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+> [!NOTE]
+> Se deben utilizar dos terminales diferentes con este método. Asegurarse que el IP de conexión de de REST esté acordé a la conexión Wi-Fi utilizada.
