@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "concurrently \"npm run start-front\" \"npm run start-back\" ",
-    "start-front": "npx expo start",
+    "start-front": "npx expo start --clear",
     "start-back": "cd backend && python -m uvicorn bot:app --host 0.0.0.0 --port 8000",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
