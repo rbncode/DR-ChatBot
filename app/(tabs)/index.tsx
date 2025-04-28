@@ -84,7 +84,7 @@ export default function ChatScreen() {
     >
       <Markdown
         style={{
-          body: { fontSize: 16 },
+          text: { color: item.sender === "user" ? "#000" : "#fff" },
         }}
       >
         {item.text}
@@ -130,18 +130,20 @@ export default function ChatScreen() {
             }}
           />
         </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder={i18n.t("placeholder")}
-            value={input}
-            onChangeText={setInput}
-            onSubmitEditing={sendMessage}
-            placeholderTextColor="#999"
-          />
-          <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
-            <Text style={styles.sendText}>{i18n.t("send")}</Text>
-          </TouchableOpacity>
+        <View style={styles.inputWrapper}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder={"¡Pregúnta algo!"}
+              value={input}
+              onChangeText={setInput}
+              onSubmitEditing={sendMessage}
+              placeholderTextColor="#999"
+            />
+            <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+              <Text style={styles.sendIcon}>➤</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -154,7 +156,7 @@ const styles = StyleSheet.create({
   },
   messagesContainer: {
     padding: 10,
-    paddingBottom: 80,
+    paddingBottom: 15,
     maxWidth: 800,
     width: "95%",
     alignSelf: "center",
@@ -168,25 +170,39 @@ const styles = StyleSheet.create({
     maxWidth: "75%",
   },
   user: {
-    backgroundColor: "#DCF8C6",
+    backgroundColor: "#d9d9d9",
     alignSelf: "flex-end",
   },
+  userText: {
+    color: "#fffff",
+  },
   assistant: {
-    backgroundColor: "#EAEAEA",
+    backgroundColor: "#252525",
     alignSelf: "flex-start",
   },
+  assistantText: {
+    color: "#000",
+  },
+
   messageText: {
     fontSize: 16,
+  },
+  inputWrapper: {
+    backgroundColor: "transparent",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 10,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
-    paddingVertical: 15,
+    paddingVertical: 1,
     maxWidth: 850,
     width: "90%",
-    backgroundColor: "transparent",
+    backgroundColor: "#fff",
     alignSelf: "center",
+    borderRadius: 50,
   },
   input: {
     flex: 1,
@@ -198,14 +214,15 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     justifyContent: "center",
-    paddingHorizontal: 15,
+    paddingHorizontal: 5,
   },
-  sendText: {
-    color: "#007AFF",
-    fontWeight: "bold",
+  sendIcon: {
+    fontSize: 50,
+    color: "#525252",
   },
   helpPopup: {
     position: "absolute",
+    alignContent: "flex-end",
     top: 80,
     alignSelf: "center",
     backgroundColor: "#fff",
