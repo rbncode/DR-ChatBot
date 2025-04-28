@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -17,11 +17,18 @@ import Markdown from "react-native-markdown-display";
 
 export default function ChatScreen() {
   const screenWidth = Dimensions.get("window").width;
-  const isLargeSreen = screenWidth >= 600;
   const [showHelp, setShowHelp] = useState(true);
-
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const flatListRef = useRef<FlatList>(null);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -85,8 +92,6 @@ export default function ChatScreen() {
     </View>
   );
 
-  const flatListRef = useRef<FlatList>(null);
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#424242" }}>
       <KeyboardAvoidingView
@@ -110,10 +115,19 @@ export default function ChatScreen() {
             data={messages}
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
-            contentContainerStyle={styles.messagesContainer}
-            onContentSizeChange={() =>
-              flatListRef.current?.scrollToEnd({ animated: true })
-            }
+            contentContainerStyle={[
+              styles.messagesContainer,
+              {
+                flexGrow: 1,
+                justifyContent: "flex-end",
+              },
+            ]}
+            onContentSizeChange={() => {
+              flatListRef.current?.scrollToEnd({ animated: false });
+            }}
+            onLayout={() => {
+              flatListRef.current?.scrollToEnd({ animated: false });
+            }}
           />
         </View>
         <View style={styles.inputContainer}>
@@ -149,8 +163,9 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingVertical: 6,
     paddingHorizontal: 14,
-    marginVertical: 2,
+    marginVertical: 10,
     borderRadius: 20,
+    maxWidth: "75%",
   },
   user: {
     backgroundColor: "#DCF8C6",
