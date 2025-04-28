@@ -60,12 +60,12 @@ async def chatbot_endpoint(pregunta_usuario: dict):
         # Cargar variables de entorno
         load_dotenv("key.env") 
     
-        system_promt = "En base a la pregunta del usuario se debe identificar una busqueda en google a realizar clave, que puede ser solo una de la siguiente lista " \
+        system_prompt = "En base a la pregunta del usuario se debe identificar una busqueda en google a realizar clave, que puede ser solo una de la siguiente lista " \
         "1) El clima del dia en la zona que se pregunta el dia de hoy(esta debe ser respondida con respecto a como se pregunte) si no se identifica la zona en la pregunta devolver: Lo siento, falta información para poder contestar a su consulta" \
-        "2) El valor de la UF a CLP hoy" \
-        "3) Valo del dolar a CLP hoy y solo puede ser en estas monedas, si se pregunta de otra moneda no corresponde" \
+        "2) El valor de la UF a CLP hoy se entiende uf o UF" \
+        "3) Valor del dolar a CLP hoy y solo puede ser en estas monedas, si se pregunta de otra moneda no corresponde se entiende dolar o usd" \
         "4) Noticias del dia en la zona que se pregunta y si no se especifica entonces de manera global" \
-        "Si el usuario pregunta algo fuera de esto devuelve una disculpa y aclarar que no puedes contestar" \
+        "Si el usuario pregunta algo fuera de esto devuelve un: Lo siento, no puedo ayudar con esa pregunta" \
         "Si puedes identificar la pregunta en una de las catergoria responde como si fueras a realizar una busqueda en google del tema poniendo lo que buscaras " \
         "entre 2 #." \
         "Si se identifica un saludo o despedida de parte del usuario responde como si fueras un asistente virtual y no como un buscador de google correspondiendo al saludo" \
@@ -84,8 +84,7 @@ async def chatbot_endpoint(pregunta_usuario: dict):
         # Extraer la pregunta para la búsqueda en Google
         busqueda = re.findall(r"\#(.*?)\#", respuesta_gemini)
         if not busqueda:
-            return {"respuesta": "Lo siento, no puedo ayudar con esa pregunta"}  # Si no hay búsqueda, devolver la respuesta directamente
-
+            return respuesta_gemini
         # Realizar búsqueda en Google
         respuesta_busqueda = busqueda_google_chatbot(busqueda[0])
        

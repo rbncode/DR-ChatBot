@@ -45,7 +45,7 @@ export default function ChatScreen() {
     Keyboard.dismiss();
 
     try {
-      const response = await fetch("http://192.168.1.12:8000/chatbot/", {
+      const response = await fetch("http://172.40.30.47:8000/chatbot/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
