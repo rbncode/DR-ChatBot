@@ -10,12 +10,10 @@ import {
   Platform,
   Keyboard,
   SafeAreaView,
-  Dimensions,
 } from "react-native";
 import Markdown from "react-native-markdown-display";
 
 export default function ChatScreen() {
-  const screenWidth = Dimensions.get("window").width;
   const [showHelp, setShowHelp] = useState(true);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -232,7 +230,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
-    maxWidth: "80%",
+    width: "60%",
+    maxWidth: 450,
     zIndex: 10,
   },
   helpText: {
